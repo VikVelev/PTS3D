@@ -117,6 +117,7 @@ Vector2::Vector2(float f): u(f), v(f) {
 
 //Vector2 Deconstructors
 Vector2::~Vector2() {
+    
 }
 
 Vector2& Vector2::operator =(const Vector2& v)
