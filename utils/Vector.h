@@ -43,6 +43,7 @@ float dot(Vector v1, Vector v2);
 //returns a Vector
 Vector cross(Vector v1, Vector v2);
 
+//inline everything for performance
 inline Vector operator +(const Vector& v1, const Vector& v2) {
 	return Vector(v1.x + v2.x,
 		          v1.y + v2.y,
@@ -91,7 +92,7 @@ inline Vector operator /(float f, const Vector& v) {
 		          f / v.z);
 }
 
-typedef Vector Point;
+typedef Vector Point; //using Vector = Point (C++ style)
 
 struct Vector2 {
 	float u, v;
