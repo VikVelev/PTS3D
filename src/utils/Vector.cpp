@@ -1,5 +1,4 @@
 #include <cmath>
-
 #include "Vector.h"
 
 //Constructors
@@ -34,12 +33,13 @@ inline float Vector::length() {
 	return std::sqrt(length2());
 }
 
+//Normalize a vector's x,y,z (map their values between 0 and 1)
 float Vector::normalize() {
-	float l = length();
+	float len = length();
+	//division between a vector and it's length
+	*this /= len;
 
-	*this /= l;
-
-	return l;
+	return len;
 }
 
 Vector Vector::normalized() {
