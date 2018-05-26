@@ -85,7 +85,7 @@ inline Vector operator /(const Vector& v, float f) {
 		          v.y / f,
 		          v.z / f);
 }
-
+ 
 inline Vector operator /(float f, const Vector& v) {
 	return Vector(f / v.x,
 	              f / v.y,
