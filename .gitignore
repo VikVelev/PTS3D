@@ -31,4 +31,6 @@
 *.out
 *.app
 
+# Files and folders
 frames/
+build/
