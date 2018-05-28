@@ -12,8 +12,10 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -lstdc++ -lm
 
 pts3d: $(SRCS)
+	@echo "Building..."
 	$(CXX) src/main/main.cpp -o $(BUILD_DIR)/$(TARGET_EXEC) $(CPPFLAGS)
 	@chmod +X $(BUILD_DIR)/$(TARGET_EXEC)
+	@echo "Cleaning up..."	
 	$(RM) $(BUILD_DIR)/$(TARGET_EXEC).d
 
 .PHONY: clean
