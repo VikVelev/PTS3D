@@ -3,6 +3,8 @@
 #include <string>
 
 #include "../utils/Vector.cpp"
+#include "../utils/Color.cpp"
+
 using namespace std;
 
 int main() {
@@ -33,8 +35,15 @@ int main() {
 
     newFrame.close();
 
+    // Testing classes
+    
     Vector vec1 = Vector(1,2,3);
     cout << "X: " << vec1.x << " Y: " << vec1.y << " Z: " << vec1.z << endl;
     Vector vec1_n = vec1.normalized();
     cout << "X: " << vec1_n.x << " Y: " << vec1_n.y << " Z: " << vec1_n.z << endl;
+
+    Color newColor = Color(0, 255, 255);
+    vec1_n.setColor(newColor);
+
+    cout << "Red: " << vec1_n.color.r << " Green: " << vec1_n.color.g << " Blue: " << vec1_n.color.b << endl;
 }

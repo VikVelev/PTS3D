@@ -1,5 +1,6 @@
 #include <cmath>
 #include "Vector.h"
+#include "Color.h"
 
 //Constructors
 Vector::Vector(): x(0.0f), y(1.0f), z(0.0f) {
@@ -15,6 +16,7 @@ Vector::Vector(float x, float y, float z): x(x), y(y), z(z) {
 }
 
 Vector::Vector(float f): x(f), y(f), z(f) {
+
 }
 
 //Destructor
@@ -40,6 +42,10 @@ float Vector::normalize() {
 	*this /= len;
 
 	return len;
+}
+
+void Vector::setColor(Color color) {
+	this->color = color;
 }
 
 Vector Vector::normalized() {

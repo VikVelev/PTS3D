@@ -1,5 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
+#include "Color.h"
 
 #ifndef NULL
 #define NULL (void *)0
@@ -18,6 +19,8 @@ inline float sqr(float n) {
 struct Vector {
 	float x, y, z;
 
+	Color color;
+
 	Vector();
 	Vector(const Vector& v);
 	Vector(float x, float y, float z);
@@ -28,6 +31,7 @@ struct Vector {
 	inline float length2();
 	inline float length();
 
+	void setColor(Color c);
 	float normalize();
 	Vector normalized();
 
