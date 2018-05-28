@@ -32,5 +32,5 @@
 *.app
 
 # Files and folders
-./frames/
-build/
+frames
+build
