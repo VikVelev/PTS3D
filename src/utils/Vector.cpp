@@ -70,6 +70,8 @@ Vector& Vector::operator =(const Vector& v) {
 	y = v.y;
 	z = v.z;
 
+	color = v.color;
+
 	return *this;
 }
 
