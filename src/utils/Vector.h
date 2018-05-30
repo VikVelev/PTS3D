@@ -31,8 +31,10 @@ struct Vector {
 	inline float length2();
 	inline float length();
 
+	void setColor(float r, float g, float b);
 	void setColor(Color c);
 	float normalize();
+	void transformToUnit();
 	Vector normalized();
 
 	Vector& operator =(const Vector& v);

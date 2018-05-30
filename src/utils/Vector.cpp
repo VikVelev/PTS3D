@@ -34,6 +34,14 @@ inline float Vector::length2() {
 inline float Vector::length() {
 	return std::sqrt(length2());
 }
+   //Transform the current vector to unit vector, effectively the same as the normalize function, but this one is local
+inline void Vector::transformToUnit(){
+	float k = 1.0 / this->length();
+
+	this->x *= k;
+	this->y *= k;
+	this->z *= k;
+}
 
 //Normalize a vector's x,y,z (map their values between 0 and 1)
 float Vector::normalize() {
@@ -42,6 +50,10 @@ float Vector::normalize() {
 	*this /= len;
 
 	return len;
+}
+
+void Vector::setColor(float r, float b, float g) {
+	this->color = Color(r, g, b);
 }
 
 void Vector::setColor(Color color) {

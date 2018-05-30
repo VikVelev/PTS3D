@@ -16,6 +16,7 @@ int main() {
 
     ofstream newFrame;
     newFrame.open("./frames/frame0.ppm", ios::out);
+    // Visit PPM File format referrence for why is this here
     newFrame << "P3\n" << X << " " << Y << "\n255\n";
 
     // Test for outputing frames
@@ -32,9 +33,8 @@ int main() {
             int ib = int(255.99*b);
 
             Vector newVector = Vector(float(i), float(j), float(i*j));
-            Color color = Color(float(ir), float(ig), float(ib));
-            
-            newVector.setColor(color);
+            newVector.setColor(Color(float(ir), float(ig), float(ib)));
+
             vectors[i][j] = newVector;
 
             newFrame << newVector.color.r << " " << newVector.color.g << " " << newVector.color.b << "\n";   
@@ -50,5 +50,9 @@ int main() {
            cout << vectors[i][j].color.r << " " << vectors[i][j].color.g << " " << vectors[i][j].color.b << endl;
         }
     }
-    cout << "Number of vectors " << X*Y << endl;
+
+    Vector testVec = Vector(5,12,18);
+    testVec.transformToUnit();
+
+    cout << testVec.x << " " << testVec.y << " " << testVec.z << endl;
 }
