@@ -1,6 +1,11 @@
 {
     "files.associations": {
+        "*.lock": "json",
+        "Pipfile": "python",
+        "*.obj": "bat",
+        "*.mlx": "xml",
         "cmath": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "fstream": "cpp"
     }
 }

@@ -22,3 +22,10 @@ pts3d: $(SRCS)
 
 clean:
 	$(RM) -r $(BUILD_DIR)
+
+debug: $(SRCS)
+	@echo "Building Debug..."
+	$(CXX) src/main/main.cpp -o $(BUILD_DIR)/$(TARGET_EXEC) $(CPPFLAGS) -g
+	@chmod +X $(BUILD_DIR)/$(TARGET_EXEC)
+	@echo "Cleaning up..."	
+	$(RM) $(BUILD_DIR)/$(TARGET_EXEC).d
