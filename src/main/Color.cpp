@@ -1,5 +1,5 @@
 #include <cmath>
-#include "Color.h"
+#include "../utils/Color.h"
 
 //Constructors
 

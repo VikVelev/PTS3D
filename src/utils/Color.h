@@ -9,7 +9,6 @@
 #define PI 3.1415926f
 #endif
 
-//'class'
 struct Color {
     float r, g, b;
 

@@ -1,6 +1,6 @@
 #ifndef RAY_H
 #define RAY_H
-#include "Vector.h"
+
 
 #ifndef NULL
 #define NULL (void *)0
@@ -10,19 +10,31 @@
 #define PI 3.1415926f
 #endif
 
-//'class'
+#include "Vector.h"
+
 struct Ray {
-	Vector origin, direction;
+    Ray() {};
+    Ray(const Vector& a, const Vector& b) {
+        Origin = a;
+        Direction = b;
+    };
+
+    Vector origin() const {
+        return Origin;
+    };
+
+    Vector direction() const {
+        return Direction;
+    };
+
+    Vector pointAtParameter(float t) const {
+        return Origin + t * Direction; 
+    };
     
-    Ray();
-    Ray(Vector v_o, Vector v_d) {
-        origin = v_o;
-        direction = v_d;
-    }
-    
-    //TODO Implement color calculation;
-    Color color(const Ray& r);
-    inline Vector point_at_paramter(float t) const { return origin + t*direction; }
+    Vector Origin;
+    Vector Direction;
+
+    virtual ~Ray() {};
 };
 
 #endif //RAY_H

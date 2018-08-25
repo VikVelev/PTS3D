@@ -4,36 +4,51 @@
 #include <stdio.h>
 
 #include "SDL2/SDL.h"
-#include "../utils/Vector.cpp"
-#include "../utils/Color.cpp"
-
+#include "Vector.cpp"
+#include "Color.cpp"
+#include "Ray.cpp"
 using namespace std;
 
-static const int X = 600;
-static const int Y = 300;
+static const int X = 1280;
+static const int Y = 720;
 
-static Vector vectors[X][Y];
+static Color pixels[X][Y];
+
+Color calculateColor(const Ray& ray) {
+    Vector unitDirection = ray.direction();
+    unitDirection.transformToUnit(); //map between 0 and 1 so I can use it for colors
+
+    float t = 0.5 * (unitDirection.y + 1.0);
+    //using vectors to calculate the linear interpolation between colors, since I already have operator overloads for them
+    Vector color = ( 1.0 - t ) * Vector(1.0, 1.0, 1.0) + t * Vector(0.5, 0.7, 1.0);
+
+    int ir = int(255.99*color.x);
+    int ig = int(255.99*color.y);
+    int ib = int(255.99*color.z);
+
+    return Color(ir, ig, ib);
+}
 
 int main() {
 
     printf( "Initializing...\n");
-    // Test
     // TODO implement Material class
-    for (int i = 0; i < X; i++) {
-        for (int j = 0; j < Y; j++) {
 
-            float r = float(j) / float(Y);
-            float g = float(i) / float(X);
-            float b = 0.2;
+    Vector lowerLeftCorner (-2.0, -1.0, -1.0);
+    Vector horizontal      (4.0, 0.0, 0.0);
+    Vector vertical        (0.0, 2.0, 0.0);
+    Vector origin          (0.0, 0.0, 0.0);
 
-            int ir = int(255.99*r);
-            int ig = int(255.99*g);
-            int ib = int(255.99*b);
+    for (int j = 0; j < Y; j++) {
+        for (int i = 0; i < X; i++) {
 
-            Vector newVector = Vector(float(i), float(j), float(i*j));
-            newVector.setColor(Color(float(ir), float(ig), float(ib)));
+            float u = float(i) / float(X);
+            float v = float(j) / float(Y);
 
-            vectors[i][j] = newVector;
+            Ray r(origin, lowerLeftCorner + u*horizontal + v*vertical);
+            Color color = calculateColor(r);
+
+            pixels[i][j] = color;
         }
     }
 
@@ -59,16 +74,16 @@ int main() {
             printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
         } else {
             //Render a all vectors
-            for (int i = 0; i < X; i++) {
-                for (int j = 0; j < Y; j++) {
+            for (int j = 0; j < Y; j++) {
+                for (int i = 0; i < X; i++) {
                     SDL_SetRenderDrawColor(
                         renderer,
-                        vectors[i][j].color.r,
-                        vectors[i][j].color.g,
-                        vectors[i][j].color.b,
+                        pixels[i][j].r,
+                        pixels[i][j].g,
+                        pixels[i][j].b,
                         255
                     );
-                    SDL_RenderDrawPoint(renderer, i, j);   
+                    SDL_RenderDrawPoint(renderer, i, j);
                 }
             }
             

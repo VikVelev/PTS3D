@@ -1,6 +1,6 @@
 #include <cmath>
-#include "Vector.h"
-#include "Color.h"
+#include "../utils/Vector.h"
+#include "../utils/Color.h"
 
 //Constructors
 Vector::Vector(): x(0.0f), y(1.0f), z(0.0f) {
