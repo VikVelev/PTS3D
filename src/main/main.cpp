@@ -16,14 +16,14 @@ static Vector vectors[X][Y];
 
 int main() {
 
-    printf( "Initializing..." );
+    printf( "Initializing...\n");
     // Test
     // TODO implement Material class
     for (int i = X - 1; i >= 0; i--) {
         for (int j = 0; j < Y; j++) {
 
             float r = float(j) / float(X);
-            float g = float(i) / float(Y); 
+            float g = float(i) / float(Y);
             float b = 0.5;
 
             int ir = int(255.99*r);
