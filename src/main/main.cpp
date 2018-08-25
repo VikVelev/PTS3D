@@ -9,8 +9,8 @@
 
 using namespace std;
 
-static const int X = 800;
-static const int Y = 800;
+static const int X = 600;
+static const int Y = 300;
 
 static Vector vectors[X][Y];
 
@@ -19,12 +19,12 @@ int main() {
     printf( "Initializing...\n");
     // Test
     // TODO implement Material class
-    for (int i = X - 1; i >= 0; i--) {
+    for (int i = 0; i < X; i++) {
         for (int j = 0; j < Y; j++) {
 
-            float r = float(j) / float(X);
-            float g = float(i) / float(Y);
-            float b = 0.5;
+            float r = float(j) / float(Y);
+            float g = float(i) / float(X);
+            float b = 0.2;
 
             int ir = int(255.99*r);
             int ig = int(255.99*g);
@@ -73,7 +73,7 @@ int main() {
             }
             
             SDL_RenderPresent(renderer);
-            
+            //while(true) {
             for (;;) {
                 if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
                     printf("Exiting...\n");
