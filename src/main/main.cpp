@@ -9,8 +9,8 @@
 #include "Ray.cpp"
 using namespace std;
 
-static const int X = 1280;
-static const int Y = 720;
+static const int X = 800;
+static const int Y = 600;
 
 static Color pixels[X][Y];
 
@@ -20,7 +20,7 @@ Color calculateColor(const Ray& ray) {
 
     float t = 0.5 * (unitDirection.y + 1.0);
     //using vectors to calculate the linear interpolation between colors, since I already have operator overloads for them
-    Vector color = ( 1.0 - t ) * Vector(1.0, 1.0, 1.0) + t * Vector(0.5, 0.7, 1.0);
+    Vector color =  ( 1.0 - t ) * Vector(0.5, 0.7, 1.0) +  t * Vector(1.0, 1.0, 1.0);
 
     int ir = int(255.99*color.x);
     int ig = int(255.99*color.y);
@@ -39,7 +39,7 @@ int main() {
     Vector vertical        (0.0, 2.0, 0.0);
     Vector origin          (0.0, 0.0, 0.0);
 
-    for (int j = 0; j < Y; j++) {
+    for (int j = Y - 1; j >= 0; j--) {
         for (int i = 0; i < X; i++) {
 
             float u = float(i) / float(X);
@@ -68,13 +68,12 @@ int main() {
         SDL_CreateWindowAndRenderer(X, Y, 0, &window, &renderer);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
         if ( window == NULL ) {
             printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
         } else {
             //Render a all vectors
-            for (int j = 0; j < Y; j++) {
+            for (int j = Y - 1; j >= 0; j--) {
                 for (int i = 0; i < X; i++) {
                     SDL_SetRenderDrawColor(
                         renderer,
