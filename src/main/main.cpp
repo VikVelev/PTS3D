@@ -44,9 +44,9 @@ Color calculateColor(const Ray& ray) {
     }
 
     Vector unitDirection = ray.direction();
-    unitDirection.transformToUnit(); //map between 0 and 1 so I can use it for colors
+    unitDirection.transformToUnit(); //map between -1 and 1
 
-    float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and
+    float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and 1 so I can use it for colors
 
     //using vectors to calculate the linear interpolation between colors, since I already have operator overloads for them
     Vector color = (1.0f - t) * Vector(0.5, 0.7, 1.0) +  t * Vector(1.0, 1.0, 1.0);
