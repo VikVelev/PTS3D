@@ -6,6 +6,7 @@
         "*.mlx": "xml",
         "cmath": "cpp",
         "ostream": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "iostream": "cpp"
     }
 }

@@ -7,26 +7,54 @@
 #include "Vector.cpp"
 #include "Color.cpp"
 #include "Ray.cpp"
+#include "../utils/Geometry.h"
+
 using namespace std;
 
-static const int X = 800;
-static const int Y = 600;
+static const int WIDTH = 200;
+static const int HEIGHT = 100;
 
-static Color pixels[X][Y];
+static Color pixels[WIDTH][HEIGHT];
+
+
+bool hitSphere(const Sphere& sphere, const Ray& ray){
+    Vector oc = ray.origin() - sphere.center;
+    float a = dot(ray.direction(), ray.direction());
+    float b = 2.0 * dot(oc, ray.direction());
+    float c = dot(oc, oc) - sphere.radius*sphere.radius;
+    float discriminant = b*b - 4*a*c;
+
+    return (discriminant > 0);
+}
+
 
 Color calculateColor(const Ray& ray) {
+
+    Sphere circle(  
+        Vector(0.0f, 0.0f, -1.0f), //center
+        0.5f, //radius
+        Color(255, 0, 0) //color (red)
+    );
+    
+    if(hitSphere(circle, ray)) {
+        return circle.color;
+    }
+
     Vector unitDirection = ray.direction();
     unitDirection.transformToUnit(); //map between 0 and 1 so I can use it for colors
 
-    float t = 0.5 * (unitDirection.y + 1.0);
+    float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and
+
     //using vectors to calculate the linear interpolation between colors, since I already have operator overloads for them
-    Vector color =  ( 1.0 - t ) * Vector(0.5, 0.7, 1.0) +  t * Vector(1.0, 1.0, 1.0);
+    Vector color = (1.0f - t) * Vector(0.5, 0.7, 1.0) +  t * Vector(1.0, 1.0, 1.0);
+    
+    cout << (1.0f - t) << endl;
 
-    int ir = int(255.99*color.x);
-    int ig = int(255.99*color.y);
-    int ib = int(255.99*color.z);
+    int r = int(255.99*color.x);
+    int g = int(255.99*color.y);
+    int b = int(255.99*color.z);
 
-    return Color(ir, ig, ib);
+    return Color(r, g, b);
 }
 
 int main() {
@@ -35,17 +63,21 @@ int main() {
     // TODO implement Material class
 
     Vector lowerLeftCorner (-2.0, -1.0, -1.0);
-    Vector horizontal      (4.0, 0.0, 0.0);
-    Vector vertical        (0.0, 2.0, 0.0);
-    Vector origin          (0.0, 0.0, 0.0);
+    Vector horizontal      (4.0 ,  0.0,  0.0);
+    Vector vertical        (0.0 ,  2.0,  0.0);
+    Vector origin          (0.0 ,  0.0,  0.0);
 
-    for (int j = Y - 1; j >= 0; j--) {
-        for (int i = 0; i < X; i++) {
+    //Build Scene
+    for (int j = 0; j < HEIGHT; j++) { // from right to left
+        for (int i = 0; i < WIDTH; i++) {   // from up to down
 
-            float u = float(i) / float(X);
-            float v = float(j) / float(Y);
+            Vector2 gradient(
+                float(i) / float(WIDTH), // u
+                float(j) / float(HEIGHT)  // v
+            );
 
-            Ray r(origin, lowerLeftCorner + u*horizontal + v*vertical);
+            Ray r(origin, lowerLeftCorner + gradient.u*horizontal + gradient.v*vertical);
+
             Color color = calculateColor(r);
 
             pixels[i][j] = color;
@@ -65,16 +97,16 @@ int main() {
     if ( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
         printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
-        SDL_CreateWindowAndRenderer(X, Y, 0, &window, &renderer);
+        SDL_CreateWindowAndRenderer(WIDTH, HEIGHT, 0, &window, &renderer);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
 
         if ( window == NULL ) {
             printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
         } else {
-            //Render a all vectors
-            for (int j = Y - 1; j >= 0; j--) {
-                for (int i = 0; i < X; i++) {
+            //Render scene
+            for (int j = 0; j < HEIGHT; j++) {
+                for (int i = 0; i < WIDTH; i++) {
                     SDL_SetRenderDrawColor(
                         renderer,
                         pixels[i][j].r,
@@ -83,11 +115,12 @@ int main() {
                         255
                     );
                     SDL_RenderDrawPoint(renderer, i, j);
+                    SDL_RenderPresent(renderer);
+                    
                 }
             }
             
-            SDL_RenderPresent(renderer);
-            //while(true) {
+            
             for (;;) {
                 if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
                     printf("Exiting...\n");
