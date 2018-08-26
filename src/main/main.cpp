@@ -11,17 +11,20 @@
 
 using namespace std;
 
-static const int WIDTH = 200;
-static const int HEIGHT = 100;
+static const int WIDTH = 1280;
+static const int HEIGHT = 720;
 
 static Color pixels[WIDTH][HEIGHT];
 
 
 bool hitSphere(const Sphere& sphere, const Ray& ray){
+    //The vector distance between the origin and the center
     Vector oc = ray.origin() - sphere.center;
-    float a = dot(ray.direction(), ray.direction());
-    float b = 2.0 * dot(oc, ray.direction());
-    float c = dot(oc, oc) - sphere.radius*sphere.radius;
+
+    //Solving a simple quadratic equation
+    float a = dot(ray.direction(), ray.direction());     //
+    float b = 2.0 * dot(oc, ray.direction());            // All this, is the expanded vectorized formula for a sphere centered at the origin of a radius R;
+    float c = dot(oc, oc) - sphere.radius*sphere.radius; //                                     X^2 + Y^2 + Z^2 = R^2
     float discriminant = b*b - 4*a*c;
 
     return (discriminant > 0);
@@ -47,8 +50,6 @@ Color calculateColor(const Ray& ray) {
 
     //using vectors to calculate the linear interpolation between colors, since I already have operator overloads for them
     Vector color = (1.0f - t) * Vector(0.5, 0.7, 1.0) +  t * Vector(1.0, 1.0, 1.0);
-    
-    cout << (1.0f - t) << endl;
 
     int r = int(255.99*color.x);
     int g = int(255.99*color.y);
@@ -115,11 +116,10 @@ int main() {
                         255
                     );
                     SDL_RenderDrawPoint(renderer, i, j);
-                    SDL_RenderPresent(renderer);
-                    
                 }
             }
-            
+
+            SDL_RenderPresent(renderer);
             
             for (;;) {
                 if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
