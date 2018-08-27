@@ -11,45 +11,35 @@
 
 using namespace std;
 
-static const int WIDTH = 1280;
-static const int HEIGHT = 720;
+static const int WIDTH = 1200;
+static const int HEIGHT = 600;
 
 static Color pixels[WIDTH][HEIGHT];
 
+Color calculateColor(const Ray& ray, Hitable *world) {
 
-bool hitSphere(const Sphere& sphere, const Ray& ray){
-    //The vector distance between the origin and the center
-    Vector oc = ray.origin() - sphere.center;
+    hitRecord record;// t parameter of the hit Sphere
+    Vector color; 
 
-    //Solving a simple quadratic equation
-    float a = dot(ray.direction(), ray.direction());     //
-    float b = 2.0 * dot(oc, ray.direction());            // All this, is the expanded vectorized formula for a sphere centered at the origin of a radius R;
-    float c = dot(oc, oc) - sphere.radius*sphere.radius; //                                     X^2 + Y^2 + Z^2 = R^2
-    float discriminant = b*b - 4*a*c;
+    if(world->hit(ray, 0.0, MAXFLOAT, record)) {
 
-    return (discriminant > 0);
-}
+        color = 0.5f * Vector(
+            record.normal.x + 1, 
+            record.normal.y + 1, 
+            record.normal.z + 1
+        ); //the same hack used below to transform t between 0 and 1
 
+    } else {
 
-Color calculateColor(const Ray& ray) {
+        Vector unitDirection = ray.direction();
+        unitDirection.transformToUnit(); //map between -1 and 1
 
-    Sphere circle(  
-        Vector(0.0f, 0.0f, -1.0f), //center
-        0.5f, //radius
-        Color(255, 0, 0) //color (red)
-    );
-    
-    if(hitSphere(circle, ray)) {
-        return circle.color;
+        float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and 1 so I can use it for colors
+
+        //using vectors to calculate the linear interpolation between colors, since I already have operator overloads for them
+        color = (1.0f - t) * Vector(1.0, 1.0, 1.0) +  t * Vector(0.5, 0.7, 1.0);
+
     }
-
-    Vector unitDirection = ray.direction();
-    unitDirection.transformToUnit(); //map between -1 and 1
-
-    float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and 1 so I can use it for colors
-
-    //using vectors to calculate the linear interpolation between colors, since I already have operator overloads for them
-    Vector color = (1.0f - t) * Vector(0.5, 0.7, 1.0) +  t * Vector(1.0, 1.0, 1.0);
 
     int r = int(255.99*color.x);
     int g = int(255.99*color.y);
@@ -63,12 +53,31 @@ int main() {
     printf( "Initializing...\n");
     // TODO implement Material class
 
-    Vector lowerLeftCorner (-2.0, -1.0, -1.0);
-    Vector horizontal      (4.0 ,  0.0,  0.0);
-    Vector vertical        (0.0 ,  2.0,  0.0);
+    float ratio = float(WIDTH) / float(HEIGHT);
+
+    Vector lowerLeftCorner (-ratio, -ratio/2, -ratio/2);
+    Vector horizontal      (ratio*2 ,  0.0,  0.0);
+    Vector vertical        (0.0 ,  ratio,  0.0);
     Vector origin          (0.0 ,  0.0,  0.0);
 
     //Build Scene
+
+    Hitable *hitable[2];
+
+    hitable[0] = new Sphere(  
+        Vector(0.0f, 0.0f, -1.0f), //center
+        0.5f, //radius
+        Color(255, 0, 0) //color (red)
+    );
+
+    hitable[1] = new Sphere(  
+        Vector(0.0f, -100.5f, -1.0f), //center
+        100.0f, //radius
+        Color(0, 255, 0) //color (green)
+    );
+
+    Hitable *world = new Scene(hitable, 2);
+
     for (int j = 0; j < HEIGHT; j++) { // from right to left
         for (int i = 0; i < WIDTH; i++) {   // from up to down
 
@@ -79,7 +88,7 @@ int main() {
 
             Ray r(origin, lowerLeftCorner + gradient.u*horizontal + gradient.v*vertical);
 
-            Color color = calculateColor(r);
+            Color color = calculateColor(r, world);
 
             pixels[i][j] = color;
         }
