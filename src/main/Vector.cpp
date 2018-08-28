@@ -1,6 +1,5 @@
 #include <cmath>
 #include "../utils/Vector.h"
-#include "../utils/Color.h"
 
 //Constructors
 Vector::Vector(): x(0.0f), y(1.0f), z(0.0f) {
@@ -43,21 +42,11 @@ inline void Vector::transformToUnit(){
 	this->z *= k;
 }
 
-//Normalize a vector's x,y,z (map their values between 0 and 1)
-float Vector::normalize() {
+Vector Vector::normalize() {
 	float len = length();
-	//division between a vector and it's length
 	*this /= len;
 
-	return len;
-}
-
-void Vector::setColor(float r, float b, float g) {
-	this->color = Color(r, g, b);
-}
-
-void Vector::setColor(Color color) {
-	this->color = color;
+	return *this;
 }
 
 Vector Vector::normalized() {
@@ -81,8 +70,6 @@ Vector& Vector::operator =(const Vector& v) {
 	x = v.x;
 	y = v.y;
 	z = v.z;
-
-	color = v.color;
 
 	return *this;
 }

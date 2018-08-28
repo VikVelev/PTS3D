@@ -7,12 +7,15 @@
 #include "Vector.cpp"
 #include "Color.cpp"
 #include "Ray.cpp"
+
 #include "../utils/Geometry.h"
+#include "../utils/Camera.h"
 
 using namespace std;
 
 static const int WIDTH = 1200;
 static const int HEIGHT = 600;
+static const int SAMPLES = 100;
 
 static Color pixels[WIDTH][HEIGHT];
 
@@ -41,11 +44,7 @@ Color calculateColor(const Ray& ray, Hitable *world) {
 
     }
 
-    int r = int(255.99*color.x);
-    int g = int(255.99*color.y);
-    int b = int(255.99*color.z);
-
-    return Color(r, g, b);
+    return Color(color);
 }
 
 int main() {
@@ -56,9 +55,9 @@ int main() {
     float ratio = float(WIDTH) / float(HEIGHT);
 
     Vector lowerLeftCorner (-ratio, -ratio/2, -ratio/2);
-    Vector horizontal      (ratio*2 ,  0.0,  0.0);
-    Vector vertical        (0.0 ,  ratio,  0.0);
-    Vector origin          (0.0 ,  0.0,  0.0);
+    Vector horizontal      (ratio*2,  0.0,  0.0);
+    Vector vertical        (0.0,  ratio,  0.0);
+    Vector origin          (0.0,  0.0,  0.0);
 
     //Build Scene
 
@@ -77,18 +76,24 @@ int main() {
     );
 
     Hitable *world = new Scene(hitable, 2);
+    Camera camera(ratio);
 
     for (int j = 0; j < HEIGHT; j++) { // from right to left
         for (int i = 0; i < WIDTH; i++) {   // from up to down
 
-            Vector2 gradient(
-                float(i) / float(WIDTH), // u
-                float(j) / float(HEIGHT)  // v
-            );
+            Vector colorStore(0, 0, 0); //storing color for antialiasing;
+            
+            //ANTIALIASING
+            for (int s = 0; s < SAMPLES; s++) {
+                float u = float(i + drand48()) / float(WIDTH);
+                float v = float(j + drand48()) / float(HEIGHT);
+                
+                Ray r = camera.getRay(u, v);
+                colorStore += calculateColor(r, world).colorV;
+            }
 
-            Ray r(origin, lowerLeftCorner + gradient.u*horizontal + gradient.v*vertical);
-
-            Color color = calculateColor(r, world);
+            colorStore /= float(SAMPLES);
+            Color color = Color(colorStore);
 
             pixels[i][j] = color;
         }
@@ -119,11 +124,12 @@ int main() {
                 for (int i = 0; i < WIDTH; i++) {
                     SDL_SetRenderDrawColor(
                         renderer,
-                        pixels[i][j].r,
-                        pixels[i][j].g,
-                        pixels[i][j].b,
+                        pixels[i][(HEIGHT - 1) - j].r, // This is so we can flip the image vertically
+                        pixels[i][(HEIGHT - 1) - j].g,
+                        pixels[i][(HEIGHT - 1) - j].b,
                         255
                     );
+
                     SDL_RenderDrawPoint(renderer, i, j);
                 }
             }

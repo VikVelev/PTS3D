@@ -11,9 +11,10 @@
 
 struct Color {
     float r, g, b;
-
+    Vector colorV;
     Color();
     Color(const Color& c);
+    Color(const Vector& colorV);
     Color(float r, float g, float b);
     Color(float color);
 
@@ -21,4 +22,4 @@ struct Color {
 };
 
 
-#endif // COLOR_H
+#endif
