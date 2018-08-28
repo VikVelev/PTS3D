@@ -39,7 +39,7 @@ Color calculateColor(const Ray& ray, Hitable *world) {
 
         float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and 1 so I can use it for colors
 
-        //using vectors to calculate the linear interpolation between colors, since I already have operator overloads for them
+        //lerp
         color = (1.0f - t) * Vector(1.0, 1.0, 1.0) +  t * Vector(0.5, 0.7, 1.0);
 
     }
@@ -83,7 +83,7 @@ int main() {
 
             if (SAMPLES > 0) {
 
-                Vector colorStore(0, 0, 0); //storing color for antialiasing;
+                Vector colorStore(0, 0, 0);
 
                 for (int s = 0; s < SAMPLES; s++) {
                     u = float(i + drand48()) / float(WIDTH);
@@ -103,7 +103,7 @@ int main() {
 
                 r = camera.getRay(u, v);
                 color = calculateColor(r, world);
-                
+
             }
 
             pixels[i][j] = color;

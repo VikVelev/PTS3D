@@ -1,15 +1,6 @@
 #ifndef RAY_H
 #define RAY_H
 
-
-#ifndef NULL
-#define NULL (void *)0
-#endif
-
-#ifndef PI
-#define PI 3.1415926f
-#endif
-
 #include "Vector.h"
 
 struct Ray {

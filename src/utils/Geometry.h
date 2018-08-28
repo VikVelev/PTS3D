@@ -1,6 +1,21 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+/* These are here because of linting issues. kur za cpp lintera */
+#ifndef VECTOR_H                                                //
+#include "../main/Vector.cpp"                                   //
+#endif                                                          // 
+                                                                //
+#ifndef RAY_H                                                   //
+#include "../main/Ray.cpp"                                      //
+#endif                                                          //
+                                                                //
+#ifndef COLOR_H                                                 //
+#include "../main/Color.cpp"                                    //
+#endif                                                          //
+/*                           END                                */
+
+
 //Hitable abstraction, so we can use it as an interface later on.
 
 struct hitRecord {
