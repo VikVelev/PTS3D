@@ -1,14 +1,6 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#ifndef NULL
-#define NULL (void *)0
-#endif
-
-#ifndef PI
-#define PI 3.1415926f
-#endif
-
 struct Color {
     float r, g, b;
     Vector colorV;

@@ -1,6 +1,15 @@
 #include <cmath>
 #include "../utils/Vector.h"
 
+#ifndef NULL
+#define NULL (void *)0
+#endif
+
+#ifndef PI
+#define PI 3.1415926f
+#endif
+
+
 //Constructors
 Vector::Vector(): x(0.0f), y(1.0f), z(0.0f) {
 

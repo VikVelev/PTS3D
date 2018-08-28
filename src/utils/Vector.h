@@ -1,15 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#ifndef NULL
-#define NULL (void *)0
-#endif
-
-#ifndef PI
-#define PI 3.1415926f
-#endif
-
-
 inline float sqr(float n) {
 	return n * n;
 }
