@@ -15,7 +15,7 @@ using namespace std;
 
 static const int WIDTH = 1200;
 static const int HEIGHT = 600;
-static const int SAMPLES = 100;
+static const int SAMPLES = 0; //ANTIALIASING SAMPLES set to 0 to turn of antialiasing
 
 static Color pixels[WIDTH][HEIGHT];
 
@@ -53,12 +53,6 @@ int main() {
     // TODO implement Material class
 
     float ratio = float(WIDTH) / float(HEIGHT);
-
-    Vector lowerLeftCorner (-ratio, -ratio/2, -ratio/2);
-    Vector horizontal      (ratio*2,  0.0,  0.0);
-    Vector vertical        (0.0,  ratio,  0.0);
-    Vector origin          (0.0,  0.0,  0.0);
-
     //Build Scene
 
     Hitable *hitable[2];
@@ -81,19 +75,36 @@ int main() {
     for (int j = 0; j < HEIGHT; j++) { // from right to left
         for (int i = 0; i < WIDTH; i++) {   // from up to down
 
-            Vector colorStore(0, 0, 0); //storing color for antialiasing;
+            float u, v;
+            Ray r;
+            Color color;
             
             //ANTIALIASING
-            for (int s = 0; s < SAMPLES; s++) {
-                float u = float(i + drand48()) / float(WIDTH);
-                float v = float(j + drand48()) / float(HEIGHT);
-                
-                Ray r = camera.getRay(u, v);
-                colorStore += calculateColor(r, world).colorV;
-            }
 
-            colorStore /= float(SAMPLES);
-            Color color = Color(colorStore);
+            if (SAMPLES > 0) {
+
+                Vector colorStore(0, 0, 0); //storing color for antialiasing;
+
+                for (int s = 0; s < SAMPLES; s++) {
+                    u = float(i + drand48()) / float(WIDTH);
+                    v = float(j + drand48()) / float(HEIGHT);
+                    
+                    r = camera.getRay(u, v);
+                    colorStore += calculateColor(r, world).colorV;
+                }
+
+                colorStore /= float(SAMPLES);
+                color = Color(colorStore);
+
+            } else {
+
+                u = float(i / float(WIDTH));
+                v = float(j / float(HEIGHT));
+
+                r = camera.getRay(u, v);
+                color = calculateColor(r, world);
+                
+            }
 
             pixels[i][j] = color;
         }
