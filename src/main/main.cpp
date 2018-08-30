@@ -15,37 +15,9 @@ using namespace std;
 
 static const int WIDTH = 1200;
 static const int HEIGHT = 600;
-static const int SAMPLES = 0; //ANTIALIASING SAMPLES set to 0 to turn of antialiasing
+static const int SAMPLES = 4; //ANTIALIASING SAMPLES set to 0 to turn of antialiasing
 
 static Color pixels[WIDTH][HEIGHT];
-
-Color calculateColor(const Ray& ray, Hitable *world) {
-
-    hitRecord record;// t parameter of the hit Sphere
-    Vector color; 
-
-    if(world->hit(ray, 0.0, MAXFLOAT, record)) {
-
-        color = 0.5f * Vector(
-            record.normal.x + 1, 
-            record.normal.y + 1, 
-            record.normal.z + 1
-        ); //the same hack used below to transform t between 0 and 1
-
-    } else {
-
-        Vector unitDirection = ray.direction();
-        unitDirection.transformToUnit(); //map between -1 and 1
-
-        float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and 1 so I can use it for colors
-
-        //lerp
-        color = (1.0f - t) * Vector(1.0, 1.0, 1.0) +  t * Vector(0.5, 0.7, 1.0);
-
-    }
-
-    return Color(color);
-}
 
 int main() {
 
@@ -55,21 +27,33 @@ int main() {
     float ratio = float(WIDTH) / float(HEIGHT);
     //Build Scene
 
-    Hitable *hitable[2];
+    Hitable *hitable[4];
 
     hitable[0] = new Sphere(  
-        Vector(0.0f, 0.0f, -1.0f), //center
+        Vector(0, 0, -1), //center
         0.5f, //radius
         Color(255, 0, 0) //color (red)
     );
 
     hitable[1] = new Sphere(  
-        Vector(0.0f, -100.5f, -1.0f), //center
+        Vector(0, -100.5f, -1), //center
         100.0f, //radius
         Color(0, 255, 0) //color (green)
     );
 
-    Hitable *world = new Scene(hitable, 2);
+    hitable[2] = new Sphere(  
+        Vector(-1.1, 0, -1), //center
+        0.5, //radius
+        Color(0, 255, 0) //color (green)
+    );
+
+    hitable[3] = new Sphere(  
+        Vector(1.1, 0, -1), //center
+        0.5, //radius
+        Color(0, 255, 0) //color (green)
+    );
+
+    Hitable *world = new Scene(hitable, 4);
     Camera camera(ratio);
 
     for (int j = 0; j < HEIGHT; j++) { // from right to left
@@ -90,7 +74,7 @@ int main() {
                     v = float(j + drand48()) / float(HEIGHT);
                     
                     r = camera.getRay(u, v);
-                    colorStore += calculateColor(r, world).colorV;
+                    colorStore += calculateColorVec(r, world);
                 }
 
                 colorStore /= float(SAMPLES);
@@ -102,7 +86,7 @@ int main() {
                 v = float(j / float(HEIGHT));
 
                 r = camera.getRay(u, v);
-                color = calculateColor(r, world);
+                color = Color(calculateColorVec(r, world));
 
             }
 
@@ -135,7 +119,7 @@ int main() {
                 for (int i = 0; i < WIDTH; i++) {
                     SDL_SetRenderDrawColor(
                         renderer,
-                        pixels[i][(HEIGHT - 1) - j].r, // This is so we can flip the image vertically
+                        pixels[i][(HEIGHT - 1) - j].r, // This is so we can flip the image horizontally
                         pixels[i][(HEIGHT - 1) - j].g,
                         pixels[i][(HEIGHT - 1) - j].b,
                         255

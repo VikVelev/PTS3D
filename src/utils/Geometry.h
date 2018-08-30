@@ -1,6 +1,8 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#include <stdlib.h>
+
 /* These are here because of linting issues. kur za cpp lintera */
 #ifndef VECTOR_H                                                //
 #include "../main/Vector.cpp"                                   //
@@ -14,7 +16,6 @@
 #include "../main/Color.cpp"                                    //
 #endif                                                          //
 /*                           END                                */
-
 
 //Hitable abstraction, so we can use it as an interface later on.
 
@@ -109,5 +110,49 @@ inline bool Sphere::hit(const Ray& ray, float tMin, float tMax, hitRecord& recor
 
     return false;
 }
+
+
+// Other really important functions
+
+Vector randomInUnitSphere() {
+    Vector p;
+    do {
+        p = 2.0*Vector(drand48(), drand48(), drand48()) - Vector(1, 1, 1);
+    } while (p.length2() >= 1);
+
+    return p;
+}
+
+
+// Calculate color function
+
+Vector calculateColorVec(const Ray& ray, Hitable *world, bool normals = false) {
+
+    hitRecord record;// t parameter of the hit Sphere
+    Vector color; 
+
+    if(world->hit(ray, 0.001, MAXFLOAT, record)) {
+
+        Vector target = record.p + record.normal + randomInUnitSphere();
+
+        if (normals) {
+            return 0.5 * (Vector(record.normal.x, record.normal.y, record.normal.z) + 1); 
+            //the same hack used below to transform t between 0 and 1
+        }
+
+        return 0.5 * calculateColorVec(Ray(record.p, target - record.p), world);
+
+    } else {
+
+        Vector unitDirection = ray.direction();
+        unitDirection.transformToUnit(); //map between -1 and 1
+
+        float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and 1 so I can use it for colors
+
+        //lerp
+        return (1.0f - t) * Vector(1.0, 1.0, 1.0) +  t * Vector(0.5, 0.7, 1.0);
+    }
+}
+
 
 #endif

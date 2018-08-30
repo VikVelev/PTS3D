@@ -3,9 +3,14 @@
 //Constructors
 
 Color::Color(const Vector& colorV): colorV(colorV) {
-    r = colorV.x * 255.99;
-    g = colorV.y * 255.99;
-    b = colorV.z * 255.99;
+
+    float x = sqrt(colorV.x);
+    float y = sqrt(colorV.y);
+    float z = sqrt(colorV.z);
+
+    r = x * 255.99;
+    g = y * 255.99;
+    b = z * 255.99;
 }
 
 Color::Color(const Color& c): r(c.r), g(c.g), b(c.b) {
