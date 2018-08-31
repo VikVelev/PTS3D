@@ -85,8 +85,8 @@ class Sphere: public Hitable {
 inline bool Sphere::hit(const Ray& ray, float tMin, float tMax, hitRecord& record) const {
     //The vector distance between the origin and the center
     Vector oc = ray.origin() - center;
+    record.matPtr = mat;
 
-    record.matPtr = mat; 
     //Solving a simple quadratic equation
     float a = dot(ray.direction(), ray.direction());     //
     float b = 2.0 * dot(oc, ray.direction());            // All this, is the expanded vectorized formula for a sphere centered at the origin of a radius R;
@@ -121,7 +121,7 @@ inline bool Sphere::hit(const Ray& ray, float tMin, float tMax, hitRecord& recor
 Vector randomInUnitSphere() {
     Vector p;
     do {
-        p = 2.0*Vector(drand48(), drand48(), drand48()) - Vector(1, 1, 1);
+        p = 2.0 * (( Vector(drand48(), drand48(), drand48()) + Vector(drand48(), drand48(), drand48()) + Vector(drand48(), drand48(), drand48())) / 3)- Vector(1, 1, 1);
     } while (p.length2() >= 1);
 
     return p;

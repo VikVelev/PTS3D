@@ -3,7 +3,7 @@
 //Constructors
 
 Color::Color(const Vector& colorV): colorV(colorV) {
-
+    //gamma correction
     float x = sqrt(colorV.x);
     float y = sqrt(colorV.y);
     float z = sqrt(colorV.z);

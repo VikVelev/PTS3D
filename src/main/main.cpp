@@ -14,9 +14,9 @@
 
 using namespace std;
 
-static const int WIDTH = 1200;
-static const int HEIGHT = 600;
-static const int SAMPLES = 6; //ANTIALIASING SAMPLES set to 0 to turn of antialiasing
+static const int WIDTH = 1280;
+static const int HEIGHT = 720;
+static const int SAMPLES = 8; //ANTIALIASING SAMPLES set to 0 to turn of antialiasing
 
 static Color pixels[WIDTH][HEIGHT];
 
@@ -56,6 +56,8 @@ int main() {
 
     Hitable *world = new Scene(hitable, 4);
     Camera camera(ratio);
+
+    printf( "Calculating...\n");
 
     for (int j = 0; j < HEIGHT; j++) { // from right to left
         for (int i = 0; i < WIDTH; i++) {   // from up to down
