@@ -8,14 +8,15 @@
 #include "Color.cpp"
 #include "Ray.cpp"
 
-#include "../utils/Geometry.h"
+#include "../utils/Geometry.h" //Important functions such as calculateColor
 #include "../utils/Camera.h"
+#include "../utils/Material.h"
 
 using namespace std;
 
 static const int WIDTH = 1200;
 static const int HEIGHT = 600;
-static const int SAMPLES = 4; //ANTIALIASING SAMPLES set to 0 to turn of antialiasing
+static const int SAMPLES = 6; //ANTIALIASING SAMPLES set to 0 to turn of antialiasing
 
 static Color pixels[WIDTH][HEIGHT];
 
@@ -32,25 +33,25 @@ int main() {
     hitable[0] = new Sphere(  
         Vector(0, 0, -1), //center
         0.5f, //radius
-        Color(255, 0, 0) //color (red)
+        new Lambertian(Vector(0.8, 0.3, 0.3)) //color (red)
     );
 
     hitable[1] = new Sphere(  
         Vector(0, -100.5f, -1), //center
         100.0f, //radius
-        Color(0, 255, 0) //color (green)
+        new Lambertian(Vector(0.8, 0.8, 0.0))
     );
 
     hitable[2] = new Sphere(  
         Vector(-1.1, 0, -1), //center
         0.5, //radius
-        Color(0, 255, 0) //color (green)
+        new Metal(Vector(0.8, 0.6, 0.2))
     );
 
     hitable[3] = new Sphere(  
         Vector(1.1, 0, -1), //center
         0.5, //radius
-        Color(0, 255, 0) //color (green)
+        new Metal(Vector(0.8, 0.8, 0.8))
     );
 
     Hitable *world = new Scene(hitable, 4);
@@ -74,7 +75,8 @@ int main() {
                     v = float(j + drand48()) / float(HEIGHT);
                     
                     r = camera.getRay(u, v);
-                    colorStore += calculateColorVec(r, world);
+                    Vector p = r.pointAtParameter(2.0);
+                    colorStore += calculateColorVec(r, world, 0);
                 }
 
                 colorStore /= float(SAMPLES);
@@ -86,7 +88,7 @@ int main() {
                 v = float(j / float(HEIGHT));
 
                 r = camera.getRay(u, v);
-                color = Color(calculateColorVec(r, world));
+                color = Color(calculateColorVec(r, world, 0));
 
             }
 

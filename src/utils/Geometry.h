@@ -15,14 +15,17 @@
 #ifndef COLOR_H                                                 //
 #include "../main/Color.cpp"                                    //
 #endif                                                          //
+                                                                //
 /*                           END                                */
 
 //Hitable abstraction, so we can use it as an interface later on.
+class Material;
 
 struct hitRecord {
     float t;
     Vector p;
     Vector normal;
+    Material *matPtr;
 };
 
 class Hitable {
@@ -65,15 +68,15 @@ class Sphere: public Hitable {
     public:
         Vector center;
         float radius;
-        Color color;
+        Material *mat;
 
         virtual bool hit(const Ray& ray, float tMin, float tMax, hitRecord& record) const;
 
         Sphere() {};
-        Sphere(const Vector& c, float r, const Color& cl) {
+        Sphere(const Vector& c, float r, Material *ma) {
             center = c;
             radius = r;
-            color = cl;
+            mat = ma;
         };
 
         virtual ~Sphere() {};
@@ -83,6 +86,7 @@ inline bool Sphere::hit(const Ray& ray, float tMin, float tMax, hitRecord& recor
     //The vector distance between the origin and the center
     Vector oc = ray.origin() - center;
 
+    record.matPtr = mat; 
     //Solving a simple quadratic equation
     float a = dot(ray.direction(), ray.direction());     //
     float b = 2.0 * dot(oc, ray.direction());            // All this, is the expanded vectorized formula for a sphere centered at the origin of a radius R;
@@ -122,37 +126,5 @@ Vector randomInUnitSphere() {
 
     return p;
 }
-
-
-// Calculate color function
-
-Vector calculateColorVec(const Ray& ray, Hitable *world, bool normals = false) {
-
-    hitRecord record;// t parameter of the hit Sphere
-    Vector color; 
-
-    if(world->hit(ray, 0.001, MAXFLOAT, record)) {
-
-        Vector target = record.p + record.normal + randomInUnitSphere();
-
-        if (normals) {
-            return 0.5 * (Vector(record.normal.x, record.normal.y, record.normal.z) + 1); 
-            //the same hack used below to transform t between 0 and 1
-        }
-
-        return 0.5 * calculateColorVec(Ray(record.p, target - record.p), world);
-
-    } else {
-
-        Vector unitDirection = ray.direction();
-        unitDirection.transformToUnit(); //map between -1 and 1
-
-        float t = 0.5 * (unitDirection.y + 1.0); //hack to get T between 0 and 1 so I can use it for colors
-
-        //lerp
-        return (1.0f - t) * Vector(1.0, 1.0, 1.0) +  t * Vector(0.5, 0.7, 1.0);
-    }
-}
-
 
 #endif
