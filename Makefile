@@ -3,13 +3,13 @@ BUILD_DIR ?= build
 SRC_DIRS ?= src
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp)
-CXX := clang
+CXX := g++
 CXXFLAGS := 
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -lstdc++ -lm -lSDL2main -lSDL2
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -lstdc++ -lm `pkg-config --libs --cflags sdl2` -fopenmp -std=c++17
 
 pts3d: $(SRCS)
 	@echo "Building..."
