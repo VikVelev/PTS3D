@@ -112,6 +112,8 @@ inline bool Sphere::hit(const Ray& ray, float tMin, float tMax, hitRecord& recor
         }
     }
 
+    
+
     return false;
 }
 

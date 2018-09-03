@@ -66,10 +66,10 @@ int main() {
             Ray r;
             Color color;
             
-            //ANTIALIASING
+           
 
             if (SAMPLES > 0) {
-
+                //ANTIALIASING
                 Vector colorStore(0, 0, 0);
 
                 for (int s = 0; s < SAMPLES; s++) {
