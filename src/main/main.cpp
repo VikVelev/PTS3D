@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
+#include <omp.h>
 
 #include "SDL2/SDL.h"
 #include "Vector.cpp"
@@ -58,43 +59,45 @@ int main() {
     Camera camera(ratio);
 
     printf( "Calculating...\n");
-
+	#pragma omp parallel for
     for (int j = 0; j < HEIGHT; j++) { // from right to left
         for (int i = 0; i < WIDTH; i++) {   // from up to down
-
-            float u, v;
-            Ray r;
-            Color color;
-            
-           
-
-            if (SAMPLES > 0) {
+            #pragma omp task shared(camera, world)
+            {
+                float u, v;
+                Ray r;
+                Color color;
+                
                 //ANTIALIASING
-                Vector colorStore(0, 0, 0);
 
-                for (int s = 0; s < SAMPLES; s++) {
-                    u = float(i + drand48()) / float(WIDTH);
-                    v = float(j + drand48()) / float(HEIGHT);
-                    
+                if (SAMPLES > 0) {
+
+                    Vector colorStore(0, 0, 0);
+
+                    for (int s = 0; s < SAMPLES; s++) {
+                        u = float(i + drand48()) / float(WIDTH);
+                        v = float(j + drand48()) / float(HEIGHT);
+                        
+                        r = camera.getRay(u, v);
+                        Vector p = r.pointAtParameter(2.0);
+                        colorStore += calculateColorVec(r, world, 0);
+                    }
+
+                    colorStore /= float(SAMPLES);
+                    color = Color(colorStore);
+
+                } else {
+
+                    u = float(i / float(WIDTH));
+                    v = float(j / float(HEIGHT));
+
                     r = camera.getRay(u, v);
-                    Vector p = r.pointAtParameter(2.0);
-                    colorStore += calculateColorVec(r, world, 0);
+                    color = Color(calculateColorVec(r, world, 0));
+
                 }
 
-                colorStore /= float(SAMPLES);
-                color = Color(colorStore);
-
-            } else {
-
-                u = float(i / float(WIDTH));
-                v = float(j / float(HEIGHT));
-
-                r = camera.getRay(u, v);
-                color = Color(calculateColorVec(r, world, 0));
-
+                pixels[i][j] = color;
             }
-
-            pixels[i][j] = color;
         }
     }
 
@@ -149,6 +152,5 @@ int main() {
             return EXIT_SUCCESS;
         }
     }
-
     return 0;
 }
