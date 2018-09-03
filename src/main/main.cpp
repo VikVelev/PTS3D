@@ -79,7 +79,7 @@ int main() {
                         v = float(j + drand48()) / float(HEIGHT);
                         
                         r = camera.getRay(u, v);
-                        Vector p = r.pointAtParameter(2.0);
+
                         colorStore += calculateColorVec(r, world, 0);
                     }
 
