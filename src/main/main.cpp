@@ -17,15 +17,14 @@ using namespace std;
 
 static const int WIDTH = 1280;
 static const int HEIGHT = 720;
-static const int SAMPLES = 8; //ANTIALIASING SAMPLES set to 0 to turn of antialiasing
+static const int SAMPLES = 1000; //SPP
 
 static Color pixels[WIDTH][HEIGHT];
 
 int main() {
 
     printf( "Initializing...\n");
-    // TODO implement Material class
-
+    
     float ratio = float(WIDTH) / float(HEIGHT);
     //Build Scene
 
@@ -59,6 +58,8 @@ int main() {
     Camera camera(ratio);
 
     printf( "Calculating...\n");
+
+
 	#pragma omp parallel for
     for (int j = 0; j < HEIGHT; j++) { // from right to left
         for (int i = 0; i < WIDTH; i++) {   // from up to down
