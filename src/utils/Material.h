@@ -47,20 +47,24 @@ Vector reflect(const Vector& vector, const Vector& normal) {
 
 class Metal : public Material {
     public:
-        Metal(const Vector& al) : albedo(al) {}
+        Vector albedo;
+        float fuzz;
+        
+        Metal(const Vector& al, float f) : albedo(al) {
+            f < 1 ? fuzz = f : fuzz = 1;
+        }
+
         virtual bool scatter(const Ray& rayIn, const hitRecord& record, Vector& attenuation, Ray& scattered) const {
 
             Vector rayDir = rayIn.direction();
             rayDir.transformToUnit();
 
             Vector reflected = reflect(rayDir, record.normal);
-            scattered = Ray(record.p, reflected);
+            scattered = Ray(record.p, reflected + fuzz*randomInUnitSphere());
             attenuation = albedo;
             
             return (dot(scattered.direction(), record.normal) > 0);
         }
-
-        Vector albedo;
 };
 
 Vector calculateColorVec(const Ray& ray, Hitable *world, int depth, bool normals = false) {
