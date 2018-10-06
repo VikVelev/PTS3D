@@ -121,7 +121,7 @@ inline bool Sphere::hit(const Ray& ray, float tMin, float tMax, hitRecord& recor
 Vector randomInUnitSphere() {
     Vector p;
     do {
-        p = 2.0 * (Vector(drand48(), drand48(), drand48()) - Vector(1, 1, 1));
+        p = 2.0 * Vector(drand48(), drand48(), drand48()) - Vector(1, 1, 1);
     } while (p.length2() >= 1);
 
     return p;

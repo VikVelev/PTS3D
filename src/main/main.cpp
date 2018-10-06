@@ -62,7 +62,7 @@ int main() {
     hitable[0] = new Sphere(  
         Vector(0, 0, -1), //center
         0.5f, //radius
-        new Lambertian(Vector(0.8, 0.3, 0.3)) //color (red)
+        new Lambertian(Vector(0.5, 0.7, 1.0)) //color (blue)
     );
 
     hitable[1] = new Sphere(  
@@ -74,13 +74,13 @@ int main() {
     hitable[2] = new Sphere(  
         Vector(-1.1, 0, -1), //center
         0.5, //radius
-        new Metal(Vector(0.8, 0.6, 0.2), 0.2)
+        new Metal(Vector(0.8, 0.6, 0.2), 0.8)
     );
 
     hitable[3] = new Sphere(  
         Vector(1.1, 0, -1), //center
         0.5, //radius
-        new Dielectric(1.5)
+        new Dielectric(2)
     );
 
     Hitable *world = new Scene(hitable, 4);
