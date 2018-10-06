@@ -21,6 +21,24 @@
 #endif                                                          //
 /*                           END                                */
 
+
+Vector reflect(const Vector& vector, const Vector& normal) {
+    return vector - 2*dot(vector, normal)*normal;
+}
+
+bool refract(const Vector& vec, const Vector& n, float ni_over_nt, Vector& refracted) {
+    Vector uv = transformToUnit(vec);
+    float dotN = dot(uv, n);
+    float discriminant = 1.0 - sqr(ni_over_nt)*(1-sqr(dotN));
+
+    if(discriminant > 0) {
+        refracted = ni_over_nt*(uv - n*dotN) - n*sqrt(discriminant);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 class Material {
     public:
         virtual bool scatter(const Ray& rayIn, const hitRecord& record, Vector& attenuation, Ray& scattered) const = 0;
@@ -41,10 +59,6 @@ class Lambertian : public Material {
         Vector albedo;
 };
 
-Vector reflect(const Vector& vector, const Vector& normal) {
-    return vector - 2*dot(vector, normal)*normal;
-}
-
 class Metal : public Material {
     public:
         Vector albedo;
@@ -64,6 +78,39 @@ class Metal : public Material {
             attenuation = albedo;
             
             return (dot(scattered.direction(), record.normal) > 0);
+        }
+};
+
+class Dielectric : public Material {
+    public:
+        float refraction;
+
+        Dielectric(float r) : refraction(r) {}
+
+        virtual bool scatter(const Ray& rayIn, const hitRecord& record, Vector& attenuation, Ray& scattered) const {
+            Vector outward_normal;
+            Vector reflected = reflect(rayIn.direction(), record.normal);
+            
+            float ni_over_nt;
+            attenuation = Vector(1.0, 1.0, 0.0);
+            Vector refracted;
+
+            if(dot(rayIn.direction(), record.normal) > 0) {
+                outward_normal = -record.normal;
+                ni_over_nt = refraction;
+            } else {
+                outward_normal = record.normal;
+                ni_over_nt = 1.0 / refraction;
+            }
+
+            if (refract(rayIn.direction(), outward_normal, ni_over_nt, refracted)) {
+                scattered = Ray(record.p, refracted);
+            } else {
+                scattered = Ray(record.p, reflected);
+                return false;
+            }
+
+            return true;
         }
 };
 

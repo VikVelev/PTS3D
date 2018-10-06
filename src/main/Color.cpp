@@ -17,7 +17,7 @@ Color::Color(const Color& c): r(c.r), g(c.g), b(c.b) {
 
 }
 
-Color::Color(): r(255.0f), g(255.0f), b(255.0f) {
+Color::Color(): r(0.0f), g(0.0f), b(0.0f) {
 
 }
 

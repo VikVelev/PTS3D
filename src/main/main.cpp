@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
 #include <omp.h>
 
 #include "SDL2/SDL.h"
@@ -15,17 +17,43 @@
 
 using namespace std;
 
-static const int WIDTH = 640;
-static const int HEIGHT = 360;
-static const int SAMPLES = 16; 
+static const int WIDTH = 400;
+static const int HEIGHT = 200;
+static const int SAMPLES = 100; 
 //SPP
 
-static Color pixels[WIDTH][HEIGHT];
+// SDL Window SETUP
+//The window we'll be rendering to
+SDL_Window* window = NULL;
+SDL_Event event;
+SDL_Renderer *renderer;
+
+//The surface contained by the window
+SDL_Surface* screenSurface = NULL;
+
+Color pixels[WIDTH][HEIGHT];
+Vector pixelsColorStore[WIDTH][HEIGHT];
+
+inline void renderScene() {
+    for (int j = 0; j < HEIGHT; j++) {
+        for (int i = 0; i < WIDTH; i++) {
+            SDL_SetRenderDrawColor(
+                renderer,
+                (Uint8)pixels[i][(HEIGHT - 1) - j].r, // This is so we can flip the image horizontally
+                (Uint8)pixels[i][(HEIGHT - 1) - j].g,
+                (Uint8)pixels[i][(HEIGHT - 1) - j].b,
+                255
+            );
+            //printf("%d %d \n", i, j);
+            SDL_RenderDrawPoint(renderer, i, j);
+        }
+    }
+}
 
 int main() {
 
     printf( "Initializing...\n");
-    
+
     float ratio = float(WIDTH) / float(HEIGHT);
     //Build Scene
 
@@ -52,65 +80,13 @@ int main() {
     hitable[3] = new Sphere(  
         Vector(1.1, 0, -1), //center
         0.5, //radius
-        new Metal(Vector(0.8, 0.8, 0.8), 1)
+        new Dielectric(1.5)
     );
 
     Hitable *world = new Scene(hitable, 4);
     Camera camera(ratio);
 
     printf( "Calculating...\n");
-
-
-	#pragma omp parallel for
-    for (int j = 0; j < HEIGHT; j++) { // from right to left
-        for (int i = 0; i < WIDTH; i++) {   // from up to down
-            #pragma omp task shared(camera, world)
-            {
-                float u, v;
-                Ray r;
-                Color color;
-                
-                //ANTIALIASING
-
-                if (SAMPLES > 0) {
-
-                    Vector colorStore(0, 0, 0);
-
-                    for (int s = 0; s < SAMPLES; s++) {
-                        u = float(i + drand48()) / float(WIDTH);
-                        v = float(j + drand48()) / float(HEIGHT);
-                        
-                        r = camera.getRay(u, v);
-
-                        colorStore += calculateColorVec(r, world, 0);
-                    }
-
-                    colorStore /= float(SAMPLES);
-                    color = Color(colorStore);
-
-                } else {
-
-                    u = float(i / float(WIDTH));
-                    v = float(j / float(HEIGHT));
-
-                    r = camera.getRay(u, v);
-                    color = Color(calculateColorVec(r, world, 0));
-
-                }
-
-                pixels[i][j] = color;
-            }
-        }
-    }
-
-    // SDL Window SETUP
-    //The window we'll be rendering to
-    SDL_Window* window = NULL;
-    SDL_Event event;
-    SDL_Renderer *renderer;
-
-    //The surface contained by the window
-    SDL_Surface* screenSurface = NULL;
 
     //Initialize SDL
     if ( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
@@ -119,39 +95,59 @@ int main() {
         SDL_CreateWindowAndRenderer(WIDTH, HEIGHT, 0, &window, &renderer);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
+    }
 
-        if ( window == NULL ) {
-            printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-        } else {
-            //Render scene
-            for (int j = 0; j < HEIGHT; j++) {
-                for (int i = 0; i < WIDTH; i++) {
-                    SDL_SetRenderDrawColor(
-                        renderer,
-                        pixels[i][(HEIGHT - 1) - j].r, // This is so we can flip the image horizontally
-                        pixels[i][(HEIGHT - 1) - j].g,
-                        pixels[i][(HEIGHT - 1) - j].b,
-                        255
-                    );
+    for (int s = 0; s < SAMPLES; s++) {
+        float u, v;
 
-                    SDL_RenderDrawPoint(renderer, i, j);
+        int rand1 = drand48();
+        int rand2 = drand48();
+
+        #pragma omp parallel for
+        for (int j = 0; j < HEIGHT; j++) { // from right to left
+            for (int i = 0; i < WIDTH; i++) {   // from up to down
+                #pragma omp task shared(camera, world)
+                {
+                    if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
+                        printf("Exiting...\n");
+
+                        SDL_DestroyRenderer(renderer);
+                        SDL_DestroyWindow(window);
+                        SDL_Quit();
+                    }
+
+                    Ray r;
+                    Color color;
+                    
+                    u = float(i + rand1) / float(WIDTH);
+                    v = float(j + rand2) / float(HEIGHT);
+
+                    r = camera.getRay(u, v);
+
+                    pixelsColorStore[i][j] += calculateColorVec(r, world, 0);
+                    color = Color((pixelsColorStore[i][j] / float(s + 1)));
+
+                    pixels[i][j] = color;
                 }
             }
+        }
 
-            SDL_RenderPresent(renderer);
-            
-            for (;;) {
-                if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
-                    printf("Exiting...\n");
-                    break;
-                }
-            }
+        renderScene();
+        SDL_RenderPresent(renderer);
+    }
+
+    renderScene();
+    printf("Done\n");
+
+    for(;;) {
+        if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
+            printf("Exiting...\n");
 
             SDL_DestroyRenderer(renderer);
             SDL_DestroyWindow(window);
             SDL_Quit();
 
-            return EXIT_SUCCESS;
+            break;
         }
     }
     return 0;

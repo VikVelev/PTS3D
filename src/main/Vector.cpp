@@ -11,7 +11,7 @@
 
 
 //Constructors
-Vector::Vector(): x(0.0f), y(1.0f), z(0.0f) {
+Vector::Vector(): x(0.0f), y(0.0f), z(0.0f) {
 
 }
 
@@ -49,6 +49,12 @@ inline void Vector::transformToUnit(){
 	this->x *= k;
 	this->y *= k;
 	this->z *= k;
+}
+
+inline Vector transformToUnit(const Vector& vec) {
+	Vector newVec(vec);
+
+	return newVec*(1.0 / newVec.length());
 }
 
 Vector Vector::normalize() {
