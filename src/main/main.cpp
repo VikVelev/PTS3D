@@ -19,8 +19,7 @@ using namespace std;
 
 static const int WIDTH = 400;
 static const int HEIGHT = 200;
-static const int SAMPLES = 100; 
-//SPP
+static const int SAMPLES = 100; //SPP
 
 // SDL Window SETUP
 //The window we'll be rendering to
@@ -31,8 +30,8 @@ SDL_Renderer *renderer;
 //The surface contained by the window
 SDL_Surface* screenSurface = NULL;
 
-Color pixels[WIDTH][HEIGHT];
-Vector pixelsColorStore[WIDTH][HEIGHT];
+Color pixels[WIDTH][HEIGHT]; // basically the screen
+Vector pixelsColorStore[WIDTH][HEIGHT]; //for dynamic spp rendering
 
 inline void renderScene() {
     for (int j = 0; j < HEIGHT; j++) {
@@ -48,6 +47,7 @@ inline void renderScene() {
             SDL_RenderDrawPoint(renderer, i, j);
         }
     }
+    SDL_RenderPresent(renderer);
 }
 
 int main() {
@@ -98,11 +98,6 @@ int main() {
     }
 
     for (int s = 0; s < SAMPLES; s++) {
-        float u, v;
-
-        int rand1 = drand48();
-        int rand2 = drand48();
-
         #pragma omp parallel for
         for (int j = 0; j < HEIGHT; j++) { // from right to left
             for (int i = 0; i < WIDTH; i++) {   // from up to down
@@ -119,8 +114,8 @@ int main() {
                     Ray r;
                     Color color;
                     
-                    u = float(i + rand1) / float(WIDTH);
-                    v = float(j + rand2) / float(HEIGHT);
+                    float u = float(i + drand48()) / float(WIDTH);
+                    float v = float(j + drand48()) / float(HEIGHT);
 
                     r = camera.getRay(u, v);
 
@@ -133,7 +128,6 @@ int main() {
         }
 
         renderScene();
-        SDL_RenderPresent(renderer);
     }
 
     renderScene();
