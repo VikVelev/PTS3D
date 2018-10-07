@@ -19,7 +19,7 @@ using namespace std;
 
 static const int WIDTH = 1280;
 static const int HEIGHT = 720;
-static const int SAMPLES = 200; //SPP
+static const int SAMPLES = 1000; //SPP
 
 // SDL Window SETUP
 //The window we'll be rendering to
@@ -32,6 +32,37 @@ SDL_Surface* screenSurface = NULL;
 
 Color pixels[WIDTH][HEIGHT]; // basically the screen
 Vector pixelsColorStore[WIDTH][HEIGHT]; //for dynamic spp rendering
+
+Hitable *generateRandomScene(int numberOfSpheres) {
+    Hitable **objects = new Hitable*[numberOfSpheres + 1];
+    objects[0] = new Sphere(Vector(0, -1000, 0), 1000, new Lambertian(Vector(0.4,0.4,0.4)));
+    int i = 1;
+    for(int a = -11; a < 11; a++) {
+        for(int b = -11; b < 11; b++) {
+            float chooseMat = drand48();
+            Vector center(a + 0.9*drand48(), 0.2, b + 0.9*drand48());
+
+            if((center - Vector(4,0.2,0)).length() > 0.9 ) {
+                if (chooseMat < 0.8) {
+                    objects[i++] = new Sphere(center, 0.2, new Lambertian(Vector(drand48()*drand48(),
+                                                                              drand48()*drand48(),
+                                                                              drand48()*drand48())));
+                } else if (chooseMat < 0.95) {
+                    objects[i++] = new Sphere(center, 0.2,
+                    new Metal(Vector(0.5*(1 + drand48()), 0.5*(1 + drand48()), 0.5*(1 + drand48())), 0.5*drand48()));
+                } else {
+                    objects[i++] = new Sphere(center, 0.2, new Dielectric(1.5));
+                }
+            }
+        }
+    }
+
+    objects[i++] = new Sphere(Vector(0,1,0), 1.0, new Dielectric(1.5));
+    objects[i++] = new Sphere(Vector(-4,1,0), 1.0, new Lambertian(Vector(0.5, 0.2, 0.1)));
+    objects[i++] = new Sphere(Vector(4,1,0), 1.0, new Metal(Vector(0.7, 0.6, 0.5), 0.0));
+
+    return new Scene(objects, i);
+}
 
 inline void renderScene() {
     for (int j = 0; j < HEIGHT; j++) {
@@ -73,13 +104,13 @@ int main() {
 
     // Glass ball
     hitable[2] = new Sphere(  
-        Vector(-1, 0, -1), //center
+        Vector(-1, 0, -1.1), //center
         -0.45f, //radius
         new Dielectric(1.5)
     );
 
     hitable[3] = new Sphere(  
-        Vector(-1, 0, -1), //center
+        Vector(-1, 0, -1.1), //center
         0.5f, //radius
         new Dielectric(1.5)
     );
@@ -94,13 +125,18 @@ int main() {
     // hitable[0] = new Sphere(Vector(-R,0,-1), R, new Lambertian(Vector(0,0,1)));
     // hitable[1] = new Sphere(Vector(R,0,-1), R, new Lambertian(Vector(1,0,0)));
 
-    Hitable *world = new Scene(hitable, 5);
+    Hitable *world = generateRandomScene(500);
+
+    Vector lookFrom(8, 2, 2);
+    Vector lookAt(3.5, 1, 0);
 
     Camera camera(
-        Vector(-2, 2,  1),
-        Vector( 0,  0, -1),
+        lookFrom,
+        lookAt,
         Vector( 0,  1,  0),
-        22, ratio);
+        30, ratio, 0.2, 
+        (lookFrom-lookAt).length()
+    );
 
     printf( "Calculating...\n");
 
@@ -147,6 +183,7 @@ int main() {
         }
 
         renderScene();
+        printf("Current SPP %d\n", s);
     }
 
     printf("Done in %d seconds\n", time(0) - startTime);
