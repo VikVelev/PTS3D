@@ -1,5 +1,5 @@
 # PTS3D
-![alt text](https://scontent-sof1-1.xx.fbcdn.net/v/t1.15752-9/40897114_327493781331647_5491220708476321792_n.png?_nc_cat=0&oh=a277758c2adc5d3fedf35692080cb615&oe=5BF666A3)
+![alt text](https://scontent-sof1-1.xx.fbcdn.net/v/t1.15752-9/43300268_951132028407291_512491045540331520_n.png?_nc_cat=102&oh=e8a0a1e2bbeb59f1100d7eb7f7f969dd&oe=5C591830)
 # In development
 A basic raytracer implemented in C++.
 # Notice
