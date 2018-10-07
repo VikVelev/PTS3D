@@ -8,6 +8,10 @@ Color::Color(const Vector& colorV): colorV(colorV) {
     float y = sqrt(colorV.y);
     float z = sqrt(colorV.z);
 
+    // float x = colorV.x;
+    // float y = colorV.y;
+    // float z = colorV.z;
+
     r = x * 255.99;
     g = y * 255.99;
     b = z * 255.99;

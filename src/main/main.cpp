@@ -17,9 +17,9 @@
 
 using namespace std;
 
-static const int WIDTH = 400;
-static const int HEIGHT = 200;
-static const int SAMPLES = 100; //SPP
+static const int WIDTH = 1280;
+static const int HEIGHT = 720;
+static const int SAMPLES = 200; //SPP
 
 // SDL Window SETUP
 //The window we'll be rendering to
@@ -57,7 +57,7 @@ int main() {
     float ratio = float(WIDTH) / float(HEIGHT);
     //Build Scene
 
-    Hitable *hitable[4];
+    Hitable *hitable[5];
 
     hitable[0] = new Sphere(  
         Vector(0, 0, -1), //center
@@ -71,20 +71,36 @@ int main() {
         new Lambertian(Vector(0.8, 0.8, 0.0))
     );
 
+    // Glass ball
     hitable[2] = new Sphere(  
-        Vector(-1.1, 0, -1), //center
-        0.5, //radius
-        new Metal(Vector(0.8, 0.6, 0.2), 0.8)
+        Vector(-1, 0, -1), //center
+        -0.45f, //radius
+        new Dielectric(1.5)
     );
 
     hitable[3] = new Sphere(  
-        Vector(1.1, 0, -1), //center
-        0.5, //radius
-        new Dielectric(2)
+        Vector(-1, 0, -1), //center
+        0.5f, //radius
+        new Dielectric(1.5)
     );
+    //end glass ball
 
-    Hitable *world = new Scene(hitable, 4);
-    Camera camera(ratio);
+    hitable[4] = new Sphere(  
+        Vector(1, 0, -1), //center
+        0.5f, //radius
+        new Metal(Vector(0.8, 0.6, 0.2), 0.2)        
+    );
+    // float R = cos(PI/4);
+    // hitable[0] = new Sphere(Vector(-R,0,-1), R, new Lambertian(Vector(0,0,1)));
+    // hitable[1] = new Sphere(Vector(R,0,-1), R, new Lambertian(Vector(1,0,0)));
+
+    Hitable *world = new Scene(hitable, 5);
+
+    Camera camera(
+        Vector(-2, 2,  1),
+        Vector( 0,  0, -1),
+        Vector( 0,  1,  0),
+        22, ratio);
 
     printf( "Calculating...\n");
 
@@ -96,6 +112,9 @@ int main() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
     }
+
+    time_t startTime;
+    time(&startTime);
 
     for (int s = 0; s < SAMPLES; s++) {
         #pragma omp parallel for
@@ -130,8 +149,7 @@ int main() {
         renderScene();
     }
 
-    renderScene();
-    printf("Done\n");
+    printf("Done in %d seconds\n", time(0) - startTime);
 
     for(;;) {
         if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {

@@ -5,30 +5,35 @@
 #include "../main/Ray.cpp"
 #endif
 
+#include<stdio.h>
+
 class Camera {
     public:
         Vector origin;
         Vector lowerLeftCorner;
         Vector horizontal;
         Vector vertical;
-        
-        Camera(float ratio) {
-            lowerLeftCorner = Vector(-ratio , -ratio/2, -ratio/2);
-            horizontal      = Vector(ratio*16/8,  0.0    ,  0.0    );
-            vertical        = Vector(0.0    ,  ratio*9/8  ,  0.0    );
-            origin          = Vector(0.0    ,  0.0    ,  0.0    );
-        }
 
-        Camera(
-            const Vector& l, 
-            const Vector& h, 
-            const Vector& v, 
-            const Vector& o
-        ) {
-            lowerLeftCorner = l;
-            horizontal = h;
-            vertical = v;
-            origin = o;
+        Camera(Vector lookFrom, Vector lookAt, Vector vup, float vfov, float ratio) {
+            //vfov = vertical fov;
+            Vector u, v, w;
+            
+            float theta = vfov * PI/180;
+            float halfHeight = tan(theta/2);
+            float halfWidth = ratio * halfHeight;
+
+            origin = lookFrom;
+            w = lookFrom - lookAt;
+            w.transformToUnit();
+
+            u = cross(vup, w);
+            u.transformToUnit();
+
+            v = cross(w, u);
+            
+            lowerLeftCorner = origin - halfWidth*u - halfHeight*v - w;
+            horizontal = 2 * halfWidth * u;
+            vertical = 2 * halfHeight * v;
         }
 
         Ray getRay(float u, float v) {
