@@ -24,12 +24,13 @@
 
 static const int RAY_DEPTH = 50;
 
-Vector reflect(const Vector &vector, const Vector &normal) {
+inline Vector reflect(const Vector &vector,
+                      const Vector &normal) {
   return vector - 2 * dot(vector, normal) * normal;
 }
 
-bool refract(const Vector &vec, const Vector &n,
-             float ni_over_nt, Vector &refracted) {
+inline bool refract(const Vector &vec, const Vector &n,
+                    float ni_over_nt, Vector &refracted) {
   Vector uv = transformToUnit(vec);
   float dotN = dot(uv, n);
   float discriminant =
@@ -44,7 +45,7 @@ bool refract(const Vector &vec, const Vector &n,
   }
 }
 
-float schlickApprox(float cosine, float refraction) {
+inline float schlickApprox(float cosine, float refraction) {
   float r0 = (1 - refraction) / (1 + refraction);
   r0 = sqr(r0);
   return r0 + (1 - r0) * pow((1 - cosine), 5);
@@ -156,8 +157,9 @@ public:
   }
 };
 
-Vector calculateColorVec(const Ray &ray, Hitable *world,
-                         int depth, bool normals = false) {
+inline Vector calculateColorVec(const Ray &ray,
+                                Hitable *world, int depth,
+                                bool normals = false) {
 
   hitRecord record; // t parameter of the hit Sphere
 
